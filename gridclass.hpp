@@ -227,6 +227,34 @@ class bundle
             return parts[index].getsym();
         }
 
+        void offsetallx(int newx)
+        {
+            // int oldx = parts[0].getx();
+            // parts[0].setx(newx);
+            for (int i = 0; i < parts.size(); i++)
+            {
+                parts[i].setx(parts[i].getx() + newx);
+            }
+        }
+        void offsetally(int newy)
+        {
+            // int oldy = parts[0].gety();
+            // parts[0].sety(newy);
+            for (int i = 0; i < parts.size(); i++)
+            {
+                parts[i].sety(parts[i].gety() + newy);
+            }
+        }
+        void offsetx(int index, int newx)
+        {
+            setx(index, getx(index) + newx);
+        }
+        void offsety(int index, int newy)
+        {
+            sety(index, gety(index) + newy);
+        }
+        
+
         void setallx(int newx)
         {
             for (int i = 0; i < parts.size(); i++)
@@ -257,6 +285,73 @@ class bundle
             }
         }
 
+        void setrangex(int start, int end, int x)
+        {
+            if (start < 0 || end > parts.size() || start > end)
+            {
+                return;
+            }
+            for (int i = start; i < end; i++)
+            {
+                setx(i, x);
+            }
+        }
+        void setrangey(int start, int end, int y)
+        {
+            if (start < 0 || end > parts.size() || start > end)
+            {
+                return;
+            }
+            for (int i = start; i < end; i++)
+            {
+                sety(i, y);
+            }
+        }
+        void setrangesym(int start, int end, char sym)
+        {
+            if (start < 0 || end > parts.size() || start > end)
+            {
+                return;
+            }
+            for (int i = start; i < end; i++)
+            {
+                setsym(i, sym);
+            }
+        }
+        void setrangecolour(int start, int end, enum Colour colour)
+        {
+            if (start < 0 || end > parts.size() || start > end)
+            {
+                return;
+            }
+            for (int i = start; i < end; i++)
+            {
+                setcolour(i, colour);
+            }
+        }
+        void setoffsetrangex(int start, int end, int x)
+        {
+            if (start < 0 || end > parts.size() || start > end)
+            {
+                return;
+            }
+            for (int i = start; i < end; i++)
+            {
+                offsetx(i, x);
+            }
+        }
+        void setoffsetrangey(int start, int end, int y)
+        {
+            if (start < 0 || end > parts.size() || start > end)
+            {
+                return;
+            }
+            for (int i = start; i < end; i++)
+            {
+                offsety(i, y);
+            }
+        }
+
         void setx(int index, int x)
         {
             parts[index].setx(x);
@@ -274,6 +369,74 @@ class bundle
             parts[index].setcolour(colour);
         }
 
+};
+
+class sbundle: public bundle
+{
+    public:
+        sbundle(string name, int amount = 1): bundle(name, amount)
+        {
+            //makespecial();
+        }
+        sbundle(string name, string filename) :bundle(name, filename)
+        {
+            //makespecial();
+        }
+        sbundle() : bundle()
+        {
+
+        }
+        void makespecial()
+        {
+            enum Colour specialcolour = YELLOW;
+            bool special = false;
+            int offset = 0;
+            int cury = 0;
+            for (int i = 0; i < getparts().size(); i++)
+            {
+                if (gety(i) != cury)
+                {
+                    offset = 0;
+                }
+                cury = gety(i);
+                if (getpart(i).getsym() == '<')
+                {
+                    //temp.setallcolour(specialcolour); //test works
+                    special = true;
+                    offset += 1;
+                    continue;
+                }
+                else if (getpart(i).getsym() == '>')
+                {
+                    special = false;
+                    offset += 1;
+                    continue;
+                }
+                // else if (temp.getpart(i).getsym() == '\n') //not executing, probably because '\n' is not being saved. instead detect changes in the y value
+                // {
+                //     temp.setallcolour(specialcolour); //test works
+                //     x = 0;
+                //     continue;
+                // }
+                
+                if (special)
+                {
+                    setcolour(i, specialcolour);
+                }
+                setx(i, getpart(i).getx() - offset);
+    
+            }
+            for (int i = 0; i < getparts().size(); i++)
+            {
+                if (getpart(i).getsym() == '<' || getpart(i).getsym() == '>')
+                {
+                    //temp.setallcolour(specialcolour); test works
+                    //temp.setsym(i, '\0');
+                    removepart(i);
+                }
+    
+            }
+        }
 };
 
 //should probably use c++ vectors now to make life easier
